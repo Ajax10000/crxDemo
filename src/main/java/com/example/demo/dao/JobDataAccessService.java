@@ -10,13 +10,16 @@ import javax.sql.DataSource;
 
 import com.example.demo.model.Job;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository("realDao")
 public class JobDataAccessService implements JobDao {
-
+    Logger logger = LoggerFactory.getLogger(JobDataAccessService.class);
+    
     @Autowired
     DataSource dataSource;
     
@@ -28,7 +31,7 @@ public class JobDataAccessService implements JobDao {
         try {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
-            System.out.println("Could not load JDBC driver for PostgreSQL");
+            logger.error("Could not load JDBC driver for PostgreSQL");
             e.printStackTrace();
         }
     }
@@ -41,13 +44,13 @@ public class JobDataAccessService implements JobDao {
 
         Connection conn = getConnection();
         if (conn == null) {
-            System.out.println("Got a null connection!");
+            logger.error("Got a null connection!");
             return -1;
         }
         
         statement = getPreparedStatement(conn, insertQuery); 
         if (statement == null) {
-            System.out.println("Got a null PreparedStatement!");
+            logger.error("Got a null PreparedStatement!");
             return -1;
         }
 
@@ -67,7 +70,7 @@ public class JobDataAccessService implements JobDao {
                 }
             }
         } catch (Exception e) {
-            System.out.println("Error occurred attempting to execute a prepared statement, query = " + insertQuery);
+            logger.error("Error occurred attempting to execute a prepared statement, query = {}", insertQuery);
             e.printStackTrace();
         }
         return generatedId;
@@ -77,14 +80,14 @@ public class JobDataAccessService implements JobDao {
         Connection conn = null;
         DataSource ds = jdbcTemplate.getDataSource();
         if (ds == null) {
-            System.out.println("Got a null DataSource!");
+            logger.error("Got a null DataSource!");
             return null;
         }
         
         try {
             conn = ds.getConnection();
         } catch(Exception e) {
-            System.out.println("Error occurred trying to get a Connection");
+            logger.error("Error occurred trying to get a Connection");
             e.printStackTrace();
         }
         return conn;
@@ -95,7 +98,7 @@ public class JobDataAccessService implements JobDao {
         try {
             statement = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
         } catch(Exception e) {
-            System.out.println("Error occurred trying to get a PreparedStatement, query = " + query);
+            logger.error("Error occurred trying to get a PreparedStatement, query = {}", query);
             e.printStackTrace();
         }
         return statement;
@@ -108,4 +111,18 @@ public class JobDataAccessService implements JobDao {
         status = jdbcTemplate.queryForObject(query, new Object[] { id }, Integer.class);
         return status;
     }
+
+    @Override 
+    public void setStatus(int id, int status) {
+        String query = "update jobs set status = " + status + " where id=" + id;
+        jdbcTemplate.update(query);
+    }
+
+    @Override 
+    public Job getJob(int id) {
+        String query = "select * from jobs where id=" + id;
+        Job job = jdbcTemplate.queryForObject(query, new Object[] { id }, Job.class);
+        return job;
+    }
+
 }

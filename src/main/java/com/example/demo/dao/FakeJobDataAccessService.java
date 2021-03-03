@@ -27,6 +27,25 @@ public class FakeJobDataAccessService implements JobDao {
             }
         }
         return -1;
-        
+    }
+
+    @Override
+    public void setStatus(int id, int status) {
+        for (int i = 0; i < DB.size(); i++) {
+            Job job = DB.get(i);
+            if (job.getId() == id) {
+                job.setStatus(status);
+            }
+        }
+    }
+    @Override 
+    public Job getJob(int id) {
+        for (int i = 0; i < DB.size(); i++) {
+            Job job = DB.get(i);
+            if (job.getId() == id) {
+                return job;
+            }
+        }
+        return null;
     }
 }

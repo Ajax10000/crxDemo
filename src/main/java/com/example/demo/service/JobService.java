@@ -24,4 +24,12 @@ public class JobService {
     public int getStatus(int id) {
         return jobDao.getStatus(id);
     }
+
+    public Job getJob(int id) {
+        return jobDao.getJob(id);
+    }
+
+    public void setStatus(int id, int status) {
+        jobDao.setStatus(id, status);
+    }
 }

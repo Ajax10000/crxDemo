@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Job {
 
     private final int id;
-    private final String name;
-    private final int status;
+    private String name;
+    private int status;
 
     public Job() {
     }
@@ -36,5 +36,13 @@ public class Job {
 
     public int getStatus() {
         return status;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }
